@@ -61,13 +61,19 @@ export const GameSocketProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   // Initialize socket
   useEffect(() => {
     // In dev: proxy handles /socket.io to localhost:3001
-    // In prod: uses current window.location.origin
-    const socket = io({
+    // If VITE_SERVER_URL is provided (e.g. Vercel deployment pointing to Render/Railway), use it.
+    // Otherwise falls back to window.location.origin.
+    const serverUrl = (import.meta as any).env?.VITE_SERVER_URL || undefined;
+    const socket = io(serverUrl, {
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
     });
     socketRef.current = socket;
+
+    socket.on('connect_error', (err) => {
+      console.warn('Socket connection error:', err.message);
+    });
 
     socket.on('connect', () => {
       setIsConnected(true);

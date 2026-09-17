@@ -13,7 +13,7 @@ export const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   defaultName,
   defaultAvatar,
 }) => {
-  const { createRoom } = useGame();
+  const { createRoom, isConnected, errorNotification } = useGame();
   const [name, setName] = useState(defaultName || '');
   const [avatar, setAvatar] = useState(defaultAvatar || '🦊');
   const [maxPlayers, setMaxPlayers] = useState(6);
@@ -27,6 +27,10 @@ export const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isConnected) {
+      setError('Game server is currently offline or unreachable. Please verify backend is running.');
+      return;
+    }
     if (!name.trim()) {
       setError('Please enter your player name');
       return;
@@ -48,7 +52,7 @@ export const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
     setIsSubmitting(false);
     if (!success) {
-      setError('Could not create game room. Check your connection.');
+      setError(errorNotification || 'Could not create game room. Game server is offline or unreachable.');
     }
   };
 

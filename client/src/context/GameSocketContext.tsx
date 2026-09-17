@@ -170,169 +170,173 @@ export const GameSocketProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   }, []);
 
-  const createRoom = useCallback(
-    async (playerName: string, avatar: string, settings?: Partial<RoomSettings>): Promise<boolean> => {
+  const emitWithAck = useCallback(
+    (event: any, payload?: any, timeoutMs = 6000): Promise<{ success: boolean; data?: any; error?: string }> => {
       const socket = socketRef.current;
-      if (!socket) return false;
+      if (!socket) {
+        return Promise.resolve({ success: false, error: 'Socket not initialized' });
+      }
+      if (!socket.connected) {
+        return Promise.resolve({
+          success: false,
+          error: 'Game server is currently offline or unreachable. Please verify backend connection.',
+        });
+      }
 
       return new Promise((resolve) => {
-        socket.emit('room:create', { playerName, avatar, settings }, (res) => {
-          if (res.success && res.data) {
-            setRoom(res.data.room);
-            setPlayerId(res.data.playerId);
-            setReconnectToken(res.data.reconnectToken);
-            saveSession(res.data.room.roomCode, res.data.playerId, res.data.reconnectToken);
-            soundManager.playClick();
-            resolve(true);
-          } else {
-            setErrorNotification(res.error || 'Failed to create room');
-            resolve(false);
+        let hasResolved = false;
+        const timer = setTimeout(() => {
+          if (!hasResolved) {
+            hasResolved = true;
+            resolve({
+              success: false,
+              error: 'Server response timed out. Please check your backend connection.',
+            });
           }
-        });
+        }, timeoutMs);
+
+        const callback = (res: any) => {
+          if (!hasResolved) {
+            hasResolved = true;
+            clearTimeout(timer);
+            resolve(res || { success: false, error: 'Empty response from server' });
+          }
+        };
+
+        if (payload !== undefined) {
+          socket.emit(event, payload, callback);
+        } else {
+          socket.emit(event, callback);
+        }
       });
     },
-    [saveSession]
+    []
+  );
+
+  const createRoom = useCallback(
+    async (playerName: string, avatar: string, settings?: Partial<RoomSettings>): Promise<boolean> => {
+      const res = await emitWithAck('room:create', { playerName, avatar, settings }, 6000);
+      if (res.success && res.data) {
+        setRoom(res.data.room);
+        setPlayerId(res.data.playerId);
+        setReconnectToken(res.data.reconnectToken);
+        saveSession(res.data.room.roomCode, res.data.playerId, res.data.reconnectToken);
+        soundManager.playClick();
+        return true;
+      } else {
+        setErrorNotification(res.error || 'Failed to create room');
+        return false;
+      }
+    },
+    [emitWithAck, saveSession]
   );
 
   const joinRoom = useCallback(
     async (roomCode: string, playerName: string, avatar: string): Promise<boolean> => {
-      const socket = socketRef.current;
-      if (!socket) return false;
-
-      return new Promise((resolve) => {
-        socket.emit('room:join', { roomCode: roomCode.trim().toUpperCase(), playerName, avatar }, (res) => {
-          if (res.success && res.data) {
-            setRoom(res.data.room);
-            setPlayerId(res.data.playerId);
-            setReconnectToken(res.data.reconnectToken);
-            saveSession(res.data.room.roomCode, res.data.playerId, res.data.reconnectToken);
-            soundManager.playClick();
-            resolve(true);
-          } else {
-            setErrorNotification(res.error || 'Failed to join room');
-            resolve(false);
-          }
-        });
-      });
+      const res = await emitWithAck(
+        'room:join',
+        { roomCode: roomCode.trim().toUpperCase(), playerName, avatar },
+        6000
+      );
+      if (res.success && res.data) {
+        setRoom(res.data.room);
+        setPlayerId(res.data.playerId);
+        setReconnectToken(res.data.reconnectToken);
+        saveSession(res.data.room.roomCode, res.data.playerId, res.data.reconnectToken);
+        soundManager.playClick();
+        return true;
+      } else {
+        setErrorNotification(res.error || 'Failed to join room');
+        return false;
+      }
     },
-    [saveSession]
+    [emitWithAck, saveSession]
   );
 
-  const updateSettings = useCallback(async (settings: Partial<RoomSettings>): Promise<boolean> => {
-    const socket = socketRef.current;
-    if (!socket) return false;
+  const updateSettings = useCallback(
+    async (settings: Partial<RoomSettings>): Promise<boolean> => {
+      const res = await emitWithAck('room:update_settings', { settings }, 6000);
+      if (!res.success) {
+        setErrorNotification(res.error || 'Failed to update settings');
+        return false;
+      }
+      return true;
+    },
+    [emitWithAck]
+  );
 
-    return new Promise((resolve) => {
-      socket.emit('room:update_settings', { settings }, (res) => {
-        if (!res.success) {
-          setErrorNotification(res.error || 'Failed to update settings');
-          resolve(false);
-        } else {
-          resolve(true);
-        }
-      });
-    });
-  }, []);
-
-  const lockBoard = useCallback(async (board: number[]): Promise<boolean> => {
-    const socket = socketRef.current;
-    if (!socket) return false;
-
-    return new Promise((resolve) => {
-      socket.emit('board:lock', { board }, (res) => {
-        if (res.success) {
-          soundManager.playClick();
-          resolve(true);
-        } else {
-          setErrorNotification(res.error || 'Failed to lock board');
-          resolve(false);
-        }
-      });
-    });
-  }, []);
+  const lockBoard = useCallback(
+    async (board: number[]): Promise<boolean> => {
+      const res = await emitWithAck('board:lock', { board }, 6000);
+      if (res.success) {
+        soundManager.playClick();
+        return true;
+      } else {
+        setErrorNotification(res.error || 'Failed to lock board');
+        return false;
+      }
+    },
+    [emitWithAck]
+  );
 
   const unlockBoard = useCallback(async (): Promise<boolean> => {
-    const socket = socketRef.current;
-    if (!socket) return false;
-
-    return new Promise((resolve) => {
-      socket.emit('board:unlock', (res) => {
-        if (res.success) {
-          soundManager.playClick();
-          resolve(true);
-        } else {
-          setErrorNotification(res.error || 'Failed to unlock board');
-          resolve(false);
-        }
-      });
-    });
-  }, []);
+    const res = await emitWithAck('board:unlock', undefined, 6000);
+    if (res.success) {
+      soundManager.playClick();
+      return true;
+    } else {
+      setErrorNotification(res.error || 'Failed to unlock board');
+      return false;
+    }
+  }, [emitWithAck]);
 
   const startGame = useCallback(async (): Promise<boolean> => {
-    const socket = socketRef.current;
-    if (!socket) return false;
+    const res = await emitWithAck('game:start', undefined, 6000);
+    if (res.success) {
+      soundManager.playClick();
+      return true;
+    } else {
+      setErrorNotification(res.error || 'Cannot start game');
+      return false;
+    }
+  }, [emitWithAck]);
 
-    return new Promise((resolve) => {
-      socket.emit('game:start', (res) => {
-        if (res.success) {
-          soundManager.playClick();
-          resolve(true);
-        } else {
-          setErrorNotification(res.error || 'Cannot start game');
-          resolve(false);
-        }
-      });
-    });
-  }, []);
+  const callNumber = useCallback(
+    async (num: number): Promise<boolean> => {
+      const res = await emitWithAck('turn:call_number', { number: num }, 6000);
+      if (res.success) {
+        return true;
+      } else {
+        setErrorNotification(res.error || 'Failed to call number');
+        return false;
+      }
+    },
+    [emitWithAck]
+  );
 
-  const callNumber = useCallback(async (num: number): Promise<boolean> => {
-    const socket = socketRef.current;
-    if (!socket) return false;
-
-    return new Promise((resolve) => {
-      socket.emit('turn:call_number', { number: num }, (res) => {
-        if (res.success) {
-          resolve(true);
-        } else {
-          setErrorNotification(res.error || 'Failed to call number');
-          resolve(false);
-        }
-      });
-    });
-  }, []);
-
-  const claimBingo = useCallback(async (lineId?: string): Promise<boolean> => {
-    const socket = socketRef.current;
-    if (!socket) return false;
-
-    return new Promise((resolve) => {
-      socket.emit('bingo:claim', { lineId }, (res) => {
-        if (res.success) {
-          resolve(true);
-        } else {
-          setErrorNotification(res.error || 'Bingo claim not accepted');
-          resolve(false);
-        }
-      });
-    });
-  }, []);
+  const claimBingo = useCallback(
+    async (lineId?: string): Promise<boolean> => {
+      const res = await emitWithAck('bingo:claim', { lineId }, 6000);
+      if (res.success) {
+        return true;
+      } else {
+        setErrorNotification(res.error || 'Bingo claim not accepted');
+        return false;
+      }
+    },
+    [emitWithAck]
+  );
 
   const rematch = useCallback(async (): Promise<boolean> => {
-    const socket = socketRef.current;
-    if (!socket) return false;
-
-    return new Promise((resolve) => {
-      socket.emit('room:rematch', (res) => {
-        if (res.success) {
-          soundManager.playClick();
-          resolve(true);
-        } else {
-          setErrorNotification(res.error || 'Failed to trigger rematch');
-          resolve(false);
-        }
-      });
-    });
-  }, []);
+    const res = await emitWithAck('room:rematch', undefined, 6000);
+    if (res.success) {
+      soundManager.playClick();
+      return true;
+    } else {
+      setErrorNotification(res.error || 'Failed to trigger rematch');
+      return false;
+    }
+  }, [emitWithAck]);
 
   const leaveRoom = useCallback(() => {
     const socket = socketRef.current;

@@ -15,7 +15,7 @@ export const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   defaultAvatar,
   initialRoomCode = '',
 }) => {
-  const { joinRoom } = useGame();
+  const { joinRoom, isConnected, errorNotification } = useGame();
   const [roomCode, setRoomCode] = useState(initialRoomCode.toUpperCase());
   const [name, setName] = useState(defaultName || '');
   const [avatar, setAvatar] = useState(defaultAvatar || '🐼');
@@ -26,6 +26,10 @@ export const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isConnected) {
+      setError('Game server is currently offline or unreachable. Please verify backend is running.');
+      return;
+    }
     if (!roomCode.trim()) {
       setError('Please enter the 5-character room code');
       return;
@@ -46,7 +50,7 @@ export const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
     setIsSubmitting(false);
     if (!success) {
-      setError('Could not join room. Verify the code and that the game has not started.');
+      setError(errorNotification || 'Could not join room. Verify the code and that the game has not started.');
     }
   };
 

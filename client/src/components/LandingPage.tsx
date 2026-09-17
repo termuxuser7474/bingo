@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { PlusCircle, LogIn, HelpCircle, Gamepad2, Zap, Trophy, Grid } from 'lucide-react';
+import { PlusCircle, LogIn, HelpCircle, Gamepad2, Zap, Trophy, Grid, Wifi, WifiOff } from 'lucide-react';
+import { useGame } from '../context/GameSocketContext.js';
 import { CreateRoomModal } from './CreateRoomModal.js';
 import { JoinRoomModal } from './JoinRoomModal.js';
 import { HowToPlayModal } from './HowToPlayModal.js';
 import { SoundToggle } from './SoundToggle.js';
 
 export const LandingPage: React.FC = () => {
+  const { isConnected } = useGame();
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
@@ -86,6 +88,35 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '12px',
+              fontWeight: 600,
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              backgroundColor: isConnected ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+              border: `1px solid ${isConnected ? 'rgba(34, 197, 94, 0.35)' : 'rgba(239, 68, 68, 0.35)'}`,
+              color: isConnected ? '#4ade80' : '#f87171',
+              transition: 'all 0.3s ease',
+            }}
+            title={isConnected ? 'Connected to game server' : 'Backend server offline or unreachable'}
+          >
+            <span
+              style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: isConnected ? '#22c55e' : '#ef4444',
+                boxShadow: isConnected ? '0 0 8px #22c55e' : '0 0 8px #ef4444',
+                display: 'inline-block',
+              }}
+            />
+            {isConnected ? 'Server Online' : 'Server Offline'}
+          </div>
+
           <button
             onClick={() => setShowHowToPlay(true)}
             className="btn btn-secondary"
@@ -96,6 +127,32 @@ export const LandingPage: React.FC = () => {
           <SoundToggle />
         </div>
       </header>
+
+      {/* Offline Alert Banner */}
+      {!isConnected && (
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '680px',
+            marginBottom: '16px',
+            padding: '10px 16px',
+            backgroundColor: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: 'var(--radius-md)',
+            color: '#fca5a5',
+            fontSize: '13px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            textAlign: 'left',
+          }}
+        >
+          <WifiOff size={18} style={{ flexShrink: 0, color: '#ef4444' }} />
+          <div>
+            <strong>Backend Server Not Connected.</strong> If you deployed this on Vercel, please deploy the backend server (e.g. on Render) and set <code style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: '2px 5px', borderRadius: '4px' }}>VITE_SERVER_URL</code>.
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <main

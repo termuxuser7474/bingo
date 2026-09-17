@@ -66,14 +66,16 @@ export const LandingPage: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          gap: '12px',
+          flexWrap: 'wrap',
           marginBottom: '20px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div
             style={{
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               borderRadius: 'var(--radius-md)',
               background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
               display: 'flex',
@@ -82,20 +84,20 @@ export const LandingPage: React.FC = () => {
               boxShadow: 'var(--shadow-glow-purple)',
             }}
           >
-            <Gamepad2 size={24} color="#ffffff" />
+            <Gamepad2 size={22} color="#ffffff" />
           </div>
           <span style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '1px' }}>BINGO</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              fontSize: '12px',
+              fontSize: '11px',
               fontWeight: 600,
-              padding: '6px 12px',
+              padding: '5px 10px',
               borderRadius: 'var(--radius-full)',
               backgroundColor: isConnected ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
               border: `1px solid ${isConnected ? 'rgba(34, 197, 94, 0.35)' : 'rgba(239, 68, 68, 0.35)'}`,
@@ -106,23 +108,23 @@ export const LandingPage: React.FC = () => {
           >
             <span
               style={{
-                width: '7px',
-                height: '7px',
+                width: '6px',
+                height: '6px',
                 borderRadius: '50%',
                 backgroundColor: isConnected ? '#22c55e' : '#ef4444',
                 boxShadow: isConnected ? '0 0 8px #22c55e' : '0 0 8px #ef4444',
                 display: 'inline-block',
               }}
             />
-            {isConnected ? 'Server Online' : 'Server Offline'}
+            {isConnected ? 'Online' : 'Offline'}
           </div>
 
           <button
             onClick={() => setShowHowToPlay(true)}
             className="btn btn-secondary"
-            style={{ padding: '8px 14px', fontSize: '14px', borderRadius: 'var(--radius-full)' }}
+            style={{ padding: '6px 12px', fontSize: '13px', borderRadius: 'var(--radius-full)', minHeight: '36px' }}
           >
-            <HelpCircle size={16} /> How to Play
+            <HelpCircle size={15} /> Guide
           </button>
           <SoundToggle />
         </div>

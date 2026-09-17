@@ -48,10 +48,10 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
           width: '100%',
           maxWidth: '860px',
           margin: '0 auto',
-          padding: '24px 20px',
+          padding: 'clamp(14px, 4vw, 24px) clamp(10px, 3vw, 20px)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '24px',
+          gap: '20px',
         }}
       >
         {/* Top Navbar */}
@@ -288,7 +288,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
         <div
           style={{
             display: 'flex',
-            gap: '14px',
+            gap: '12px',
             justifyContent: 'center',
             flexWrap: 'wrap',
           }}
@@ -297,15 +297,15 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
             onClick={handlePlayAgain}
             disabled={isRematching}
             className="btn btn-success"
-            style={{ padding: '16px 28px', fontSize: '16px' }}
+            style={{ padding: '14px 24px', fontSize: '15px', flex: '1 1 220px' }}
           >
-            <RotateCcw size={18} /> {isRematching ? 'Resetting Match...' : 'PLAY AGAIN (REMATCH)'}
+            <RotateCcw size={18} /> {isRematching ? 'Resetting...' : 'PLAY AGAIN (REMATCH)'}
           </button>
 
           <button
             onClick={onNewGame}
             className="btn btn-primary"
-            style={{ padding: '16px 24px', fontSize: '16px' }}
+            style={{ padding: '14px 20px', fontSize: '15px', flex: '1 1 150px' }}
           >
             <PlusCircle size={18} /> NEW GAME
           </button>
@@ -313,9 +313,9 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
           <button
             onClick={handleReturnHome}
             className="btn btn-secondary"
-            style={{ padding: '16px 24px', fontSize: '16px' }}
+            style={{ padding: '14px 20px', fontSize: '15px', flex: '1 1 150px' }}
           >
-            <Home size={18} /> RETURN TO HOME
+            <Home size={18} /> HOME
           </button>
         </div>
       </div>

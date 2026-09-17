@@ -462,58 +462,70 @@ export const BoardSetupView: React.FC<BoardSetupViewProps> = ({ onBackToLobby })
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1fr 1fr',
-          gap: '8px',
+          gridTemplateColumns: 'minmax(120px, 2fr) 1fr 1fr 1fr',
+          gap: 'clamp(4px, 1.5vw, 8px)',
         }}
       >
         <button
           onClick={handleRandomize}
           disabled={isLocked}
           className="btn btn-primary"
-          style={{ minHeight: '44px', padding: '8px 12px', fontSize: '13px', fontWeight: 800 }}
+          style={{ minHeight: '42px', padding: '6px 10px', fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 800 }}
         >
-          <Shuffle size={15} /> RANDOMIZE
+          <Shuffle size={14} /> RANDOMIZE
         </button>
 
         <button
           onClick={handleUndo}
           disabled={history.length === 0 || isLocked}
           className="btn btn-secondary"
-          style={{ minHeight: '44px', padding: '8px', fontSize: '12px' }}
+          style={{ minHeight: '42px', padding: '6px', fontSize: '12px' }}
           title="Undo"
+          aria-label="Undo"
         >
-          <Undo2 size={15} />
+          <Undo2 size={16} />
         </button>
 
         <button
           onClick={handleRedo}
           disabled={redoStack.length === 0 || isLocked}
           className="btn btn-secondary"
-          style={{ minHeight: '44px', padding: '8px', fontSize: '12px' }}
+          style={{ minHeight: '42px', padding: '6px', fontSize: '12px' }}
           title="Redo"
+          aria-label="Redo"
         >
-          <Redo2 size={15} />
+          <Redo2 size={16} />
         </button>
 
         <button
           onClick={handleResetBoard}
           disabled={placedNumbers.size === 0 || isLocked}
           className="btn btn-danger"
-          style={{ minHeight: '44px', padding: '8px', fontSize: '12px' }}
+          style={{ minHeight: '42px', padding: '6px', fontSize: '12px' }}
           title="Clear Board"
+          aria-label="Clear Board"
         >
-          <Trash2 size={15} />
+          <Trash2 size={16} />
         </button>
       </div>
 
       {/* STICKY BOTTOM ACTION BAR */}
-      <div className="sticky-bottom-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+      <div
+        className="sticky-bottom-bar"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '10px',
+          padding: '10px 14px calc(10px + var(--sab))',
+        }}
+      >
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <span style={{ fontSize: '12px', fontWeight: 800, color: isComplete ? '#34d399' : '#fbbf24' }}>
-            {isComplete ? 'Board Complete!' : `Place ${25 - placedNumbers.size} more numbers`}
+            {isComplete ? 'Board Complete!' : `Place ${25 - placedNumbers.size} more`}
           </span>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-            {readyCount}/{totalCount} Players Ready
+            {readyCount}/{totalCount} Ready
           </span>
         </div>
 
@@ -521,9 +533,9 @@ export const BoardSetupView: React.FC<BoardSetupViewProps> = ({ onBackToLobby })
           <button
             onClick={handleUnlockBoard}
             className="btn btn-secondary"
-            style={{ minHeight: '46px', padding: '8px 20px', fontSize: '14px', fontWeight: 800 }}
+            style={{ minHeight: '44px', padding: '6px clamp(12px, 3vw, 20px)', fontSize: '13px', fontWeight: 800 }}
           >
-            <Unlock size={16} /> UNLOCK BOARD
+            <Unlock size={15} /> UNLOCK
           </button>
         ) : (
           <button
@@ -531,15 +543,15 @@ export const BoardSetupView: React.FC<BoardSetupViewProps> = ({ onBackToLobby })
             disabled={!isComplete || isLocking}
             className="btn btn-success"
             style={{
-              minHeight: '46px',
-              padding: '8px 24px',
-              fontSize: '15px',
+              minHeight: '44px',
+              padding: '6px clamp(14px, 4vw, 24px)',
+              fontSize: '14px',
               fontWeight: 900,
               letterSpacing: '0.5px',
               boxShadow: isComplete ? '0 0 20px rgba(16, 185, 129, 0.5)' : 'none',
             }}
           >
-            <Lock size={16} /> {isLocking ? 'Locking...' : 'LOCK BOARD'}
+            <Lock size={15} /> {isLocking ? 'Locking...' : 'LOCK BOARD'}
           </button>
         )}
       </div>

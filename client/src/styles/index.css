@@ -262,11 +262,24 @@ button, input, select, .btn, .bingo-cell, .number-bank-item, .clickable {
 .bingo-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 5px;
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
   aspect-ratio: 1 / 1;
+}
+
+@media (max-width: 480px) {
+  .bingo-grid {
+    gap: 4px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .bingo-grid {
+    gap: 3px;
+  }
 }
 
 @media (min-width: 480px) {
@@ -384,7 +397,19 @@ button, input, select, .btn, .bingo-cell, .number-bank-item, .clickable {
 .number-bank-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 5px;
+}
+
+@media (max-width: 480px) {
+  .number-bank-grid {
+    gap: 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .number-bank-grid {
+    gap: 3px;
+  }
 }
 
 @media (min-width: 480px) {
@@ -397,18 +422,35 @@ button, input, select, .btn, .bingo-cell, .number-bank-item, .clickable {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  height: 44px;
+  min-height: 42px;
+  height: 42px;
   background: rgba(28, 38, 59, 0.75);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
+}
+
+@media (max-width: 480px) {
+  .number-bank-item {
+    min-height: 38px;
+    height: 38px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .number-bank-item {
+    min-height: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
 }
 
 .number-bank-item:active:not(.placed) {
@@ -538,3 +580,49 @@ button, input, select, .btn, .bingo-cell, .number-bank-item, .clickable {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+
+/* ==================================================
+   MOBILE UTILITIES & RESPONSIVE BREAKPOINTS
+   ================================================== */
+@media (max-width: 640px) {
+  .btn {
+    min-height: 42px;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-panel {
+    padding: 12px;
+    border-radius: var(--radius-md);
+  }
+  .input-field {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+  .sticky-bottom-bar {
+    padding: 10px 12px calc(10px + var(--sab));
+  }
+}
+
+@media (max-width: 360px) {
+  .glass-panel {
+    padding: 10px;
+  }
+}
+
+/* Prevent sticky hover on mobile touch devices */
+@media (hover: none) {
+  .btn:hover {
+    transform: none !important;
+  }
+  .bingo-cell:hover:not(.locked) {
+    background: rgba(24, 34, 53, 0.85);
+  }
+  .number-bank-item:hover:not(.placed) {
+    background: rgba(28, 38, 59, 0.75);
+  }
+}
+

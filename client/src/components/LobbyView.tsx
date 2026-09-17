@@ -137,7 +137,9 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ onPrepareBoard }) => {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: '10px',
             margin: '10px 0 20px',
           }}
         >
@@ -158,23 +160,25 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ onPrepareBoard }) => {
             {room.roomCode}
           </div>
 
-          <button
-            onClick={handleCopyCode}
-            className="btn btn-secondary"
-            title="Copy Room Code"
-            style={{ padding: '12px', minHeight: '44px', borderRadius: 'var(--radius-md)' }}
-          >
-            {copied ? <Check size={18} color="#10b981" /> : <Copy size={18} />}
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={handleCopyCode}
+              className="btn btn-secondary"
+              title="Copy Room Code"
+              style={{ padding: '10px 14px', minHeight: '44px', borderRadius: 'var(--radius-md)' }}
+            >
+              {copied ? <Check size={18} color="#10b981" /> : <Copy size={18} />}
+            </button>
 
-          <button
-            onClick={handleShare}
-            className="btn btn-secondary"
-            title="Share Room"
-            style={{ padding: '12px', minHeight: '44px', borderRadius: 'var(--radius-md)' }}
-          >
-            <Share2 size={18} />
-          </button>
+            <button
+              onClick={handleShare}
+              className="btn btn-secondary"
+              title="Share Room"
+              style={{ padding: '10px 14px', minHeight: '44px', borderRadius: 'var(--radius-md)' }}
+            >
+              <Share2 size={18} />
+            </button>
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -194,7 +198,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ onPrepareBoard }) => {
       <div
         className="glass-panel"
         style={{
-          padding: '20px',
+          padding: 'clamp(14px, 3vw, 20px)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -209,10 +213,10 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ onPrepareBoard }) => {
         }}
       >
         <div>
-          <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '4px' }}>
+          <h3 style={{ fontSize: 'clamp(16px, 3.5vw, 18px)', fontWeight: 800, marginBottom: '4px' }}>
             {myPlayer?.isReady ? '🎉 Board Complete & Locked!' : '📋 Step 1: Arrange Your 5×5 Board'}
           </h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
             {myPlayer?.isReady
               ? 'You are ready! Waiting for other players before the host starts the countdown.'
               : 'Place numbers 1–25 into your custom grid before the game can begin.'}
@@ -222,31 +226,33 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ onPrepareBoard }) => {
         <button
           onClick={onPrepareBoard}
           className={myPlayer?.isReady ? 'btn btn-secondary' : 'btn btn-primary'}
-          style={{ padding: '14px 28px', fontSize: '15px' }}
+          style={{ padding: '12px 24px', fontSize: '14px', width: 'clamp(100%, 100%, auto)' }}
         >
           <Grid size={18} /> {myPlayer?.isReady ? 'Modify Board' : 'PREPARE BOARD'}
         </button>
       </div>
 
       {/* Players List & Status */}
-      <div className="glass-panel" style={{ padding: '28px' }}>
+      <div className="glass-panel" style={{ padding: 'clamp(16px, 4vw, 28px)' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: '20px',
+            flexWrap: 'wrap',
+            gap: '10px',
           }}
         >
-          <h3 style={{ fontSize: '18px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Users size={20} color="#8b5cf6" /> Players in Lobby
+          <h3 style={{ fontSize: '17px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Users size={18} color="#8b5cf6" /> Players in Lobby
           </h3>
 
           <div
             style={{
-              fontSize: '14px',
+              fontSize: '13px',
               fontWeight: 700,
-              padding: '6px 14px',
+              padding: '4px 12px',
               borderRadius: 'var(--radius-full)',
               background: readyCount === totalPlayers && totalPlayers >= 2
                 ? 'rgba(16, 185, 129, 0.15)'
@@ -255,11 +261,11 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ onPrepareBoard }) => {
               border: `1px solid ${readyCount === totalPlayers && totalPlayers >= 2 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
             }}
           >
-            {readyCount} / {totalPlayers} Players Ready
+            {readyCount} / {totalPlayers} Ready
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '14px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))', gap: '12px' }}>
           {players.map((p) => {
             const isMe = p.id === playerId;
             return (

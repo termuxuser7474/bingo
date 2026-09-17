@@ -292,7 +292,7 @@ export const GameplayView: React.FC = () => {
         </span>
       </div>
 
-      <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', width: '100%' }}>
+      <div style={{ display: 'flex', gap: 'clamp(4px, 1.5vw, 8px)', justifyContent: 'center', width: '100%' }}>
         {(['B', 'I', 'N', 'G', 'O'] as const).map((letter, idx) => {
           const isUnlocked = idx < myPlayer.bingoProgress;
           const isLatest = idx === myPlayer.bingoProgress - 1;
@@ -303,14 +303,14 @@ export const GameplayView: React.FC = () => {
               style={{
                 flex: '1 1 0',
                 maxWidth: '68px',
-                height: '46px',
+                height: 'clamp(38px, 9vw, 48px)',
                 borderRadius: 'var(--radius-sm)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontFamily: 'var(--font-display)',
-                fontSize: '18px',
+                fontSize: 'clamp(15px, 4vw, 19px)',
                 fontWeight: 900,
                 transition: 'all 0.25s ease',
                 background: isUnlocked
@@ -328,7 +328,7 @@ export const GameplayView: React.FC = () => {
               }}
             >
               <span>{letter}</span>
-              <span style={{ fontSize: '10px', fontWeight: 800, marginTop: '-2px', color: isUnlocked ? '#34d399' : 'rgba(255,255,255,0.2)' }}>
+              <span style={{ fontSize: '9px', fontWeight: 800, marginTop: '-2px', color: isUnlocked ? '#34d399' : 'rgba(255,255,255,0.2)' }}>
                 {isUnlocked ? '✓' : '○'}
               </span>
             </div>
@@ -795,6 +795,63 @@ export const GameplayView: React.FC = () => {
           {renderBingoBoard()}
           {renderCalledNumbersBar()}
           {renderNumberCallingGrid()}
+        </div>
+      )}
+
+      {/* MOBILE STICKY CALL ACTION BAR (Pops up above safe area when number is chosen) */}
+      {!isDesktop && isMyTurn && candidateNumber !== null && !calledSet.has(candidateNumber) && (
+        <div
+          className="sticky-bottom-bar"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '10px',
+            borderTop: '1.5px solid var(--accent-cyan)',
+            boxShadow: '0 -8px 24px rgba(6, 182, 212, 0.25)',
+            zIndex: 90,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Selected:</span>
+            <span
+              style={{
+                fontSize: '20px',
+                fontWeight: 900,
+                color: '#38bdf8',
+                fontFamily: 'var(--font-display)',
+                padding: '2px 8px',
+                background: 'rgba(6, 182, 212, 0.2)',
+                borderRadius: '6px',
+              }}
+            >
+              {candidateNumber}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => setCandidateNumber(null)}
+              className="btn btn-secondary"
+              style={{ minHeight: '40px', padding: '6px 12px', fontSize: '13px' }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmCall}
+              disabled={isCallingNumber}
+              className="btn btn-success"
+              style={{
+                minHeight: '40px',
+                padding: '6px 18px',
+                fontSize: '14px',
+                fontWeight: 800,
+                boxShadow: '0 0 16px rgba(16, 185, 129, 0.4)',
+              }}
+            >
+              <Megaphone size={15} /> {isCallingNumber ? 'Calling...' : `CALL ${candidateNumber}`}
+            </button>
+          </div>
         </div>
       )}
 

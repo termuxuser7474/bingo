@@ -1,0 +1,471 @@
+{
+  "rooms": {
+    "EEJFE": {
+      "id": "d803e7cb-3bd3-473d-be61-a29518b94d71",
+      "code": "EEJFE",
+      "hostId": "57623bf4-1cc1-408b-8acc-f75884ede46a",
+      "status": "BOARD_SETUP",
+      "settingsJson": "{\"maxPlayers\":6,\"maxWinners\":3,\"turnTimeoutSeconds\":30,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789661079768,
+      "updatedAt": 1789661398569
+    },
+    "26EB2": {
+      "id": "56a97f2a-fcfa-44c1-9765-f93f005e4a2b",
+      "code": "26EB2",
+      "hostId": "fd747835-f8aa-4702-8d9a-188bd10ec0b0",
+      "status": "LOBBY",
+      "settingsJson": "{\"maxPlayers\":6,\"maxWinners\":3,\"turnTimeoutSeconds\":30,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789661413597,
+      "updatedAt": 1789661413708
+    },
+    "XMS2G": {
+      "id": "c53404c5-1418-4ba5-aea3-5708fd20bd83",
+      "code": "XMS2G",
+      "hostId": "946c508e-5cf7-4751-9f42-a6971be0299c",
+      "status": "BOARD_SETUP",
+      "settingsJson": "{\"maxPlayers\":4,\"maxWinners\":2,\"turnTimeoutSeconds\":0,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789661538605,
+      "updatedAt": 1789661558030
+    },
+    "7V5RV": {
+      "id": "4fb38e90-920c-4f2f-8ec4-75d3e1892b37",
+      "code": "7V5RV",
+      "hostId": "fa387a0f-7415-4cda-9096-55c09c6cfbcf",
+      "status": "BOARD_SETUP",
+      "settingsJson": "{\"maxPlayers\":4,\"maxWinners\":2,\"turnTimeoutSeconds\":0,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789661566666,
+      "updatedAt": 1789661586595
+    },
+    "KRZHG": {
+      "id": "1f06a0ee-df42-4c49-9467-fbf47cf4bda4",
+      "code": "KRZHG",
+      "hostId": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "status": "PLAYING",
+      "settingsJson": "{\"maxPlayers\":6,\"maxWinners\":3,\"turnTimeoutSeconds\":30,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[{\"playerId\":\"7561b7be-ef66-40cd-9461-a3c2570c17f6\",\"playerName\":\"SR\",\"avatar\":\"🦊\",\"rank\":1,\"lineCount\":1,\"scoreAwarded\":100,\"timestamp\":1789661848580},{\"playerId\":\"70958050-9b05-44cb-a961-54217f525ed8\",\"playerName\":\"DB\",\"avatar\":\"🦊\",\"rank\":2,\"lineCount\":1,\"scoreAwarded\":75,\"timestamp\":1789661861578}]",
+      "createdAt": 1789661708711,
+      "updatedAt": 1789661981048
+    },
+    "VR5S4": {
+      "id": "29306842-02b4-453b-a1e6-8d6d8b2bef48",
+      "code": "VR5S4",
+      "hostId": "59da7aee-ff1b-40d9-b8c0-26868d98c705",
+      "status": "BOARD_SETUP",
+      "settingsJson": "{\"maxPlayers\":4,\"maxWinners\":2,\"turnTimeoutSeconds\":0,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789662186147,
+      "updatedAt": 1789662205500
+    },
+    "5NYJN": {
+      "id": "5bd870ee-c328-4912-99e6-62145a506ada",
+      "code": "5NYJN",
+      "hostId": "035dda7e-1c23-45e6-8461-37a92627862c",
+      "status": "BOARD_SETUP",
+      "settingsJson": "{\"maxPlayers\":4,\"maxWinners\":2,\"turnTimeoutSeconds\":0,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789662745108,
+      "updatedAt": 1789662764824
+    },
+    "G3FA4": {
+      "id": "a9e458bc-fc70-4087-8a7f-d0d275112c86",
+      "code": "G3FA4",
+      "hostId": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "status": "RESULTS",
+      "settingsJson": "{\"maxPlayers\":6,\"maxWinners\":3,\"turnTimeoutSeconds\":30,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[{\"playerId\":\"8a373a1e-b172-4c51-84b9-087453adcddf\",\"playerName\":\"DB\",\"avatar\":\"🦊\",\"rank\":1,\"lineCount\":6,\"scoreAwarded\":100,\"timestamp\":1789663091128},{\"playerId\":\"220b3cbc-318c-419e-9b09-a30ab1443422\",\"playerName\":\"SR\",\"avatar\":\"🦊\",\"rank\":2,\"lineCount\":6,\"scoreAwarded\":75,\"timestamp\":1789663111680}]",
+      "createdAt": 1789662884815,
+      "updatedAt": 1789663239021
+    },
+    "T7HC4": {
+      "id": "22575c6b-3f11-46ec-97e5-e468983b086d",
+      "code": "T7HC4",
+      "hostId": "f01864cc-13f6-45fd-894a-e351700bc490",
+      "status": "BOARD_SETUP",
+      "settingsJson": "{\"maxPlayers\":4,\"maxWinners\":2,\"turnTimeoutSeconds\":0,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789663580775,
+      "updatedAt": 1789663600118
+    },
+    "MJSMH": {
+      "id": "18ec0f9b-2fd2-4a76-8f02-02de67c61880",
+      "code": "MJSMH",
+      "hostId": "45b79edc-5e60-4538-afc8-0c9746fd4824",
+      "status": "LOBBY",
+      "settingsJson": "{\"maxPlayers\":6,\"maxWinners\":3,\"turnTimeoutSeconds\":30,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789663804180,
+      "updatedAt": 1789663836546
+    },
+    "R2F2R": {
+      "id": "4f6a6368-25e2-45e3-b02f-5e1529b23545",
+      "code": "R2F2R",
+      "hostId": "ba3272a6-659f-4a91-9c44-cd926742a6d3",
+      "status": "LOBBY",
+      "settingsJson": "{\"maxPlayers\":6,\"maxWinners\":3,\"turnTimeoutSeconds\":30,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789664657583,
+      "updatedAt": 1789664659403
+    }
+  },
+  "players": {
+    "fd747835-f8aa-4702-8d9a-188bd10ec0b0": {
+      "id": "fd747835-f8aa-4702-8d9a-188bd10ec0b0",
+      "roomCode": "26EB2",
+      "name": "Host-Alice",
+      "avatar": "🦊",
+      "isHost": true,
+      "isReady": false,
+      "boardJson": null,
+      "score": 0,
+      "bingoCount": 0,
+      "claimedLinesJson": "[]",
+      "reconnectToken": "f6e1dc3e-ae06-4013-b70f-055a001abea5",
+      "connectionStatus": "connected",
+      "lastSeen": 1789661413708
+    },
+    "7561b7be-ef66-40cd-9461-a3c2570c17f6": {
+      "id": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "roomCode": "KRZHG",
+      "name": "SR",
+      "avatar": "🦊",
+      "isHost": true,
+      "isReady": true,
+      "boardJson": "[7,3,18,2,5,19,15,14,16,10,21,9,24,13,12,4,6,11,20,17,25,1,22,23,8]",
+      "score": 100,
+      "bingoCount": 1,
+      "claimedLinesJson": "[\"col-1\"]",
+      "reconnectToken": "c07cef5f-2cec-44f1-a130-894bbb15edb4",
+      "connectionStatus": "connected",
+      "lastSeen": 1789661981048
+    },
+    "70958050-9b05-44cb-a961-54217f525ed8": {
+      "id": "70958050-9b05-44cb-a961-54217f525ed8",
+      "roomCode": "KRZHG",
+      "name": "DB",
+      "avatar": "🦊",
+      "isHost": false,
+      "isReady": true,
+      "boardJson": "[1,7,10,23,14,17,2,15,6,20,8,11,3,9,24,18,4,16,25,21,12,19,5,22,13]",
+      "score": 75,
+      "bingoCount": 1,
+      "claimedLinesJson": "[\"col-2\"]",
+      "reconnectToken": "e2402df8-ce41-4936-bb33-03d736ba0276",
+      "connectionStatus": "connected",
+      "lastSeen": 1789661981048
+    },
+    "220b3cbc-318c-419e-9b09-a30ab1443422": {
+      "id": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "roomCode": "G3FA4",
+      "name": "SR",
+      "avatar": "🦊",
+      "isHost": true,
+      "isReady": true,
+      "boardJson": "[23,15,21,12,4,5,17,22,3,24,13,2,7,1,11,9,18,14,6,19,20,16,8,10,25]",
+      "score": 315,
+      "bingoCount": 12,
+      "claimedLinesJson": "[\"col-2\",\"row-4\",\"diag-1\",\"col-0\",\"row-3\",\"col-4\",\"col-3\",\"row-2\",\"row-0\",\"row-1\",\"col-1\",\"diag-0\"]",
+      "reconnectToken": "848ac854-31d9-4b72-a2a6-624d39adee2e",
+      "connectionStatus": "disconnected",
+      "lastSeen": 1789663239021
+    },
+    "ba3272a6-659f-4a91-9c44-cd926742a6d3": {
+      "id": "ba3272a6-659f-4a91-9c44-cd926742a6d3",
+      "roomCode": "R2F2R",
+      "name": "SR",
+      "avatar": "🦊",
+      "isHost": true,
+      "isReady": false,
+      "boardJson": null,
+      "score": 0,
+      "bingoCount": 0,
+      "claimedLinesJson": "[]",
+      "reconnectToken": "fe37209b-54eb-4490-b7db-26cbd6c5f944",
+      "connectionStatus": "connected",
+      "lastSeen": 1789664659403
+    }
+  },
+  "playersByRoom": {
+    "EEJFE": [],
+    "26EB2": [
+      "fd747835-f8aa-4702-8d9a-188bd10ec0b0"
+    ],
+    "XMS2G": [],
+    "7V5RV": [],
+    "KRZHG": [
+      "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "70958050-9b05-44cb-a961-54217f525ed8"
+    ],
+    "VR5S4": [],
+    "5NYJN": [],
+    "G3FA4": [
+      "220b3cbc-318c-419e-9b09-a30ab1443422"
+    ],
+    "T7HC4": [],
+    "MJSMH": [],
+    "R2F2R": [
+      "ba3272a6-659f-4a91-9c44-cd926742a6d3"
+    ]
+  },
+  "calledNumbers": [
+    {
+      "roomCode": "KRZHG",
+      "number": 15,
+      "calledById": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "timestamp": 1789661807949
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 3,
+      "calledById": "70958050-9b05-44cb-a961-54217f525ed8",
+      "timestamp": 1789661820168
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 6,
+      "calledById": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "timestamp": 1789661824830
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 16,
+      "calledById": "70958050-9b05-44cb-a961-54217f525ed8",
+      "timestamp": 1789661829349
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 9,
+      "calledById": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "timestamp": 1789661834255
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 5,
+      "calledById": "70958050-9b05-44cb-a961-54217f525ed8",
+      "timestamp": 1789661838317
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 1,
+      "calledById": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "timestamp": 1789661842868
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 10,
+      "calledById": "70958050-9b05-44cb-a961-54217f525ed8",
+      "timestamp": 1789661859968
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 25,
+      "calledById": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "timestamp": 1789661890249
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 4,
+      "calledById": "70958050-9b05-44cb-a961-54217f525ed8",
+      "timestamp": 1789661920468
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 21,
+      "calledById": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "timestamp": 1789661950759
+    },
+    {
+      "roomCode": "KRZHG",
+      "number": 17,
+      "calledById": "70958050-9b05-44cb-a961-54217f525ed8",
+      "timestamp": 1789661981047
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 21,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789662983897
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 25,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789662991318
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 22,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789662994686
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 24,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789662998179
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 7,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663001624
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 10,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789663005474
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 14,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663008437
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 13,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789663021257
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 8,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663027050
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 16,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789663035911
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 6,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663042399
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 4,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789663048344
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 20,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663052637
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 9,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789663057034
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 3,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663067107
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 1,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789663071247
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 18,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663075304
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 23,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789663081774
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 5,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663087305
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 11,
+      "calledById": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "timestamp": 1789663091128
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 19,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663111680
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 12,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663141961
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 2,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663172192
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 15,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663202333
+    },
+    {
+      "roomCode": "G3FA4",
+      "number": 17,
+      "calledById": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "timestamp": 1789663239021
+    }
+  ],
+  "bingoClaims": [
+    {
+      "roomCode": "KRZHG",
+      "playerId": "7561b7be-ef66-40cd-9461-a3c2570c17f6",
+      "lineId": "col-1",
+      "rank": 1,
+      "scoreAwarded": 100,
+      "timestamp": 1789661848580
+    },
+    {
+      "roomCode": "KRZHG",
+      "playerId": "70958050-9b05-44cb-a961-54217f525ed8",
+      "lineId": "col-2",
+      "rank": 2,
+      "scoreAwarded": 75,
+      "timestamp": 1789661861578
+    },
+    {
+      "roomCode": "G3FA4",
+      "playerId": "8a373a1e-b172-4c51-84b9-087453adcddf",
+      "lineId": "col-1,col-0,diag-1,col-3,row-4,diag-0",
+      "rank": 1,
+      "scoreAwarded": 100,
+      "timestamp": 1789663091128
+    },
+    {
+      "roomCode": "G3FA4",
+      "playerId": "220b3cbc-318c-419e-9b09-a30ab1443422",
+      "lineId": "col-2,row-4,diag-1,col-0,row-3,col-4",
+      "rank": 2,
+      "scoreAwarded": 75,
+      "timestamp": 1789663111680
+    }
+  ]
+}

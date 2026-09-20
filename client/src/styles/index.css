@@ -664,4 +664,11 @@ button, input, select, .btn, .bingo-cell, .number-bank-item, .clickable {
   }
 }
 
+/* Hide sound toggle text on small screens / mobile viewports to prevent banner overflow */
+@media (max-width: 540px) {
+  .sound-toggle-label {
+    display: none !important;
+  }
+}
+
 

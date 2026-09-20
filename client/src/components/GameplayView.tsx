@@ -176,58 +176,62 @@ export const GameplayView: React.FC = () => {
     <div
       className="glass-panel"
       style={{
-        padding: '10px 14px',
+        padding: '8px 10px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '10px',
+        gap: '6px',
         borderRadius: 'var(--radius-md)',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1 }}>
         <button
           onClick={leaveRoom}
           className="btn btn-secondary"
-          style={{ minHeight: '36px', height: '36px', padding: '6px 10px', fontSize: '12px' }}
+          style={{ minHeight: '34px', height: '34px', padding: '4px 8px', fontSize: '12px', flexShrink: 0 }}
           title="Leave Match"
         >
-          <LogOut size={14} />
+          <LogOut size={13} />
           <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{room.roomCode}</span>
         </button>
 
         <h1
           style={{
-            fontSize: '18px',
+            fontSize: windowWidth < 380 ? '15px' : '17px',
             fontWeight: 900,
             fontFamily: 'var(--font-display)',
-            letterSpacing: '1px',
+            letterSpacing: '0.5px',
             background: 'linear-gradient(135deg, #a78bfa, #38bdf8)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             margin: 0,
+            whiteSpace: 'nowrap',
           }}
         >
           BINGO
         </h1>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
         <div
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '5px',
+            gap: '4px',
             fontSize: '11px',
             fontWeight: 700,
             color: isConnected ? '#34d399' : '#f43f5e',
             background: isConnected ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.15)',
-            padding: '4px 8px',
+            padding: '4px 7px',
             borderRadius: 'var(--radius-full)',
             border: `1px solid ${isConnected ? 'rgba(16, 185, 129, 0.25)' : 'rgba(244, 63, 94, 0.3)'}`,
+            whiteSpace: 'nowrap',
           }}
         >
           {isConnected ? <Wifi size={12} /> : <WifiOff size={12} />}
-          <span style={{ display: windowWidth < 380 ? 'none' : 'inline' }}>
+          <span style={{ display: windowWidth < 420 ? 'none' : 'inline' }}>
             {isConnected ? 'Live' : 'Reconnecting...'}
           </span>
         </div>
@@ -236,15 +240,15 @@ export const GameplayView: React.FC = () => {
           <button
             onClick={() => setPlayersSheetOpen(true)}
             className="btn btn-secondary"
-            style={{ minHeight: '36px', height: '36px', padding: '6px 10px', fontSize: '12px', gap: '5px' }}
+            style={{ minHeight: '34px', height: '34px', padding: '4px 8px', fontSize: '12px', gap: '4px', flexShrink: 0 }}
             title="View Players"
           >
-            <Users size={14} color="#38bdf8" />
+            <Users size={13} color="#38bdf8" />
             <span>{room.players.length}</span>
           </button>
         )}
 
-        <SoundToggle />
+        <SoundToggle compact={windowWidth < 540} />
       </div>
     </div>
   );

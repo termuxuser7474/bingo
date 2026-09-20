@@ -47,71 +47,48 @@ export const ZyraforgePromoCard: React.FC<ZyraforgePromoCardProps> = ({ compact 
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
+          flexDirection: 'column',
+          gap: '3px',
           minWidth: 0,
-          flex: '1 1 230px',
+          flex: '1 1 220px',
+          textAlign: 'left',
         }}
       >
-        {/* Sleek brand badge mark */}
-        <div
-          style={{
-            width: compact ? '34px' : '38px',
-            height: compact ? '34px' : '38px',
-            borderRadius: '9px',
-            background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            boxShadow: '0 0 12px rgba(139, 92, 246, 0.4)',
-            color: '#ffffff',
-            fontWeight: 900,
-            fontSize: compact ? '16px' : '18px',
-            fontFamily: 'var(--font-display)',
-            letterSpacing: '-0.5px',
-          }}
-        >
-          Z
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            <span
-              style={{
-                fontSize: compact ? '13px' : '14px',
-                fontWeight: 800,
-                color: '#ffffff',
-                letterSpacing: '0.3px',
-              }}
-            >
-              Built by Zyraforge
-            </span>
-            <span
-              style={{
-                fontSize: '10px',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                background: 'rgba(139, 92, 246, 0.25)',
-                color: '#c4b5fd',
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '3px',
-              }}
-            >
-              <Sparkles size={10} /> CREATOR
-            </span>
-          </div>
-          <div
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span
             style={{
-              fontSize: compact ? '11px' : '12px',
-              color: '#94a3b8',
-              lineHeight: 1.3,
+              fontSize: compact ? '14px' : '15px',
+              fontWeight: 800,
+              color: '#ffffff',
+              letterSpacing: '0.3px',
             }}
           >
-            Building modern digital products &amp; experiences
-          </div>
+            Built by Zyraforge
+          </span>
+          <span
+            style={{
+              fontSize: '10px',
+              padding: '2px 7px',
+              borderRadius: '4px',
+              background: 'rgba(139, 92, 246, 0.25)',
+              color: '#c4b5fd',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <Sparkles size={11} /> CREATOR
+          </span>
+        </div>
+        <div
+          style={{
+            fontSize: compact ? '12px' : '13px',
+            color: '#94a3b8',
+            lineHeight: 1.4,
+          }}
+        >
+          Building modern digital products &amp; experiences
         </div>
       </div>
 
@@ -121,12 +98,12 @@ export const ZyraforgePromoCard: React.FC<ZyraforgePromoCardProps> = ({ compact 
           display: 'inline-flex',
           alignItems: 'center',
           gap: '6px',
-          padding: compact ? '5px 10px' : '6px 14px',
+          padding: compact ? '6px 12px' : '7px 15px',
           borderRadius: 'var(--radius-full)',
           background: isHovered ? 'rgba(139, 92, 246, 0.35)' : 'rgba(255, 255, 255, 0.06)',
           border: isHovered ? '1px solid #8b5cf6' : '1px solid rgba(255, 255, 255, 0.12)',
           color: isHovered ? '#ffffff' : '#cbd5e1',
-          fontSize: compact ? '11px' : '12px',
+          fontSize: compact ? '12px' : '13px',
           fontWeight: 700,
           whiteSpace: 'nowrap',
           marginLeft: 'auto',
@@ -135,7 +112,7 @@ export const ZyraforgePromoCard: React.FC<ZyraforgePromoCardProps> = ({ compact 
       >
         <span>Visit zyraforge.in</span>
         <ExternalLink
-          size={compact ? 12 : 13}
+          size={compact ? 13 : 14}
           style={{
             transform: isHovered ? 'translateX(2px)' : 'none',
             transition: 'transform 0.2s ease',

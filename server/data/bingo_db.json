@@ -109,6 +109,26 @@
       "winnerHistoryJson": "[]",
       "createdAt": 1789664657583,
       "updatedAt": 1789664659403
+    },
+    "UXUN8": {
+      "id": "8a232f7e-bb57-4824-a91a-68874165db49",
+      "code": "UXUN8",
+      "hostId": "65906d5c-c229-4823-b860-2489076f6b94",
+      "status": "BOARD_SETUP",
+      "settingsJson": "{\"maxPlayers\":4,\"maxWinners\":2,\"turnTimeoutSeconds\":0,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789912460081,
+      "updatedAt": 1789912494428
+    },
+    "723DP": {
+      "id": "2dafca0a-6a98-4ff1-ab85-e6f27b03555a",
+      "code": "723DP",
+      "hostId": "d13ec753-8fee-4813-b47d-8822ec3d36f8",
+      "status": "BOARD_SETUP",
+      "settingsJson": "{\"maxPlayers\":6,\"maxWinners\":3,\"turnTimeoutSeconds\":30,\"soundEnabled\":true,\"scoringConfig\":{\"first\":100,\"second\":75,\"third\":50,\"subsequent\":25}}",
+      "winnerHistoryJson": "[]",
+      "createdAt": 1789912627455,
+      "updatedAt": 1789913056703
     }
   },
   "players": {
@@ -208,7 +228,9 @@
     "MJSMH": [],
     "R2F2R": [
       "ba3272a6-659f-4a91-9c44-cd926742a6d3"
-    ]
+    ],
+    "UXUN8": [],
+    "723DP": []
   },
   "calledNumbers": [
     {

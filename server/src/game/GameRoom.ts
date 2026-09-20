@@ -53,6 +53,9 @@ export class GameRoom {
   public lastCalledNumber: number | null = null;
   public winnerHistory: WinnerRecord[] = [];
   public createdAt: number;
+  public turnStartedAt: number | null = null;
+  public turnExpiresAt: number | null = null;
+  private lastJoinTimestamp: number;
 
   private claimedLinesByPlayer: Map<string, Set<string>> = new Map();
   private turnTimer: NodeJS.Timeout | null = null;
@@ -70,6 +73,7 @@ export class GameRoom {
     this.id = uuidv4();
     this.code = code.toUpperCase();
     this.createdAt = Date.now();
+    this.lastJoinTimestamp = this.createdAt;
     this.callbacks = callbacks || null;
 
     this.settings = {
@@ -104,8 +108,10 @@ export class GameRoom {
       completedLines: [],
       connectionStatus: 'connected',
       reconnectToken: token,
+      joinedAt: this.createdAt,
+      hasBingo: false,
+      bingoRank: undefined,
     };
-
 
     this.players.set(hostId, host);
     this.claimedLinesByPlayer.set(hostId, new Set());
@@ -162,6 +168,9 @@ export class GameRoom {
 
   public toState(): GameState {
     const currentTurn = this.getCurrentTurnPlayer();
+    const now = Date.now();
+    const secondsLeft = this.turnExpiresAt ? Math.max(0, Math.ceil((this.turnExpiresAt - now) / 1000)) : null;
+
     return {
       roomId: this.id,
       roomCode: this.code,
@@ -173,19 +182,26 @@ export class GameRoom {
         const claimedSet = this.claimedLinesByPlayer.get(p.id) || new Set<string>();
         const uniqueCount = claimedSet.size;
         const progress = Math.min(5, uniqueCount);
+        const winnerRec = this.winnerHistory.find((w) => w.playerId === p.id);
+
         return {
           ...p,
+          isHost: p.id === this.hostId,
           bingoCount: uniqueCount,
           bingoProgress: progress,
           letters: BINGO_LETTERS.slice(0, progress),
           completedLineIds: Array.from(claimedSet),
           completedLines,
+          hasBingo: progress >= 5 || !!winnerRec,
+          bingoRank: winnerRec?.rank,
         };
       }),
 
       turnIndex: this.turnIndex,
       currentTurnPlayerId: currentTurn ? currentTurn.id : null,
-      turnTimeRemaining: this.turnSecondsLeft,
+      turnStartedAt: this.turnStartedAt,
+      turnExpiresAt: this.turnExpiresAt,
+      turnTimeRemaining: secondsLeft,
       calledNumbers: [...this.calledNumbers],
       lastCalledNumber: this.lastCalledNumber,
       winnerHistory: [...this.winnerHistory],
@@ -199,6 +215,45 @@ export class GameRoom {
     if (this.callbacks) {
       this.callbacks.onStateUpdate(this.toState());
     }
+  }
+
+  /**
+   * Deterministically elects a new host from remaining active players.
+   * Rule: Earliest joined active connected player; tie-break by playerId.
+   */
+  public electNewHost(excludePlayerId?: string): boolean {
+    const connected = Array.from(this.players.values()).filter(
+      (p) => p.id !== excludePlayerId && p.connectionStatus === 'connected'
+    );
+
+    let nextHost: Player | undefined;
+
+    if (connected.length > 0) {
+      connected.sort((a, b) => (a.joinedAt ?? 0) - (b.joinedAt ?? 0) || a.id.localeCompare(b.id));
+      nextHost = connected[0];
+    } else {
+      const anyRemaining = Array.from(this.players.values()).filter((p) => p.id !== excludePlayerId);
+      if (anyRemaining.length > 0) {
+        anyRemaining.sort((a, b) => (a.joinedAt ?? 0) - (b.joinedAt ?? 0) || a.id.localeCompare(b.id));
+        nextHost = anyRemaining[0];
+      }
+    }
+
+    if (nextHost) {
+      this.hostId = nextHost.id;
+      for (const p of this.players.values()) {
+        p.isHost = p.id === this.hostId;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  private getNextJoinTimestamp(): number {
+    const now = Date.now();
+    this.lastJoinTimestamp = Math.max(now, this.lastJoinTimestamp + 1);
+    return this.lastJoinTimestamp;
   }
 
   // --- Player Management ---
@@ -242,8 +297,10 @@ export class GameRoom {
       completedLines: [],
       connectionStatus: 'connected',
       reconnectToken,
+      joinedAt: this.getNextJoinTimestamp(),
+      hasBingo: false,
+      bingoRank: undefined,
     };
-
 
     this.players.set(playerId, newPlayer);
     this.claimedLinesByPlayer.set(playerId, new Set());
@@ -269,6 +326,8 @@ export class GameRoom {
       this.disconnectTimers.delete(playerId);
     }
 
+    player.isHost = player.id === this.hostId;
+
     this.broadcastState();
     return { success: true, player };
   }
@@ -279,31 +338,32 @@ export class GameRoom {
 
     player.connectionStatus = 'disconnected';
 
-    // If game is in LOBBY or BOARD_SETUP and player is not ready, remove player after 30s
-    // If game is PLAYING, preserve state and auto-skip turn if active
-    const timer = setTimeout(() => {
-      if (this.status === 'LOBBY' || this.status === 'BOARD_SETUP') {
-        this.removePlayer(playerId);
-      } else if (this.status === 'PLAYING') {
-        const currentTurn = this.getCurrentTurnPlayer();
-        if (currentTurn?.id === playerId) {
-          this.advanceTurn();
+    const wasHost = this.hostId === playerId;
+    const wasCurrentTurn = this.status === 'PLAYING' && this.getCurrentTurnPlayer()?.id === playerId;
+
+    if (wasHost) {
+      this.electNewHost(playerId);
+    }
+
+    // Clear any previous disconnect timer for this player
+    const prevTimer = this.disconnectTimers.get(playerId);
+    if (prevTimer) {
+      clearTimeout(prevTimer);
+      this.disconnectTimers.delete(playerId);
+    }
+
+    if (this.status === 'LOBBY' || this.status === 'BOARD_SETUP') {
+      const timer = setTimeout(() => {
+        if (this.players.get(playerId)?.connectionStatus === 'disconnected') {
+          this.removePlayer(playerId);
         }
+      }, 30000);
+      this.disconnectTimers.set(playerId, timer);
+    } else if (this.status === 'PLAYING') {
+      if (wasCurrentTurn) {
+        this.advanceTurn();
       }
-    }, 15000);
-
-    this.disconnectTimers.set(playerId, timer);
-
-    // If host disconnected, transfer host to next available connected player
-    if (player.isHost) {
-      const nextHost = Array.from(this.players.values()).find(
-        (p) => p.id !== playerId && p.connectionStatus === 'connected'
-      );
-      if (nextHost) {
-        player.isHost = false;
-        nextHost.isHost = true;
-        this.hostId = nextHost.id;
-      }
+      this.checkGameCompletion();
     }
 
     this.broadcastState();
@@ -313,14 +373,28 @@ export class GameRoom {
     const player = this.players.get(playerId);
     if (!player) return;
 
+    const wasHost = this.hostId === playerId;
+    const wasCurrentTurn = this.status === 'PLAYING' && this.getCurrentTurnPlayer()?.id === playerId;
+
     this.players.delete(playerId);
     this.claimedLinesByPlayer.delete(playerId);
     db.removePlayer(playerId);
 
-    if (player.isHost && this.players.size > 0) {
-      const nextHost = Array.from(this.players.values())[0];
-      nextHost.isHost = true;
-      this.hostId = nextHost.id;
+    const timer = this.disconnectTimers.get(playerId);
+    if (timer) {
+      clearTimeout(timer);
+      this.disconnectTimers.delete(playerId);
+    }
+
+    if (wasHost && this.players.size > 0) {
+      this.electNewHost(playerId);
+    }
+
+    if (this.status === 'PLAYING') {
+      if (wasCurrentTurn) {
+        this.advanceTurn();
+      }
+      this.checkGameCompletion();
     }
 
     this.broadcastState();
@@ -433,16 +507,32 @@ export class GameRoom {
     this.lastCalledNumber = null;
     this.winnerHistory = [];
     this.claimedLinesByPlayer.clear();
+    this.turnStartedAt = null;
+    this.turnExpiresAt = null;
+    this.turnSecondsLeft = null;
 
     for (const player of this.players.values()) {
       this.claimedLinesByPlayer.set(player.id, new Set());
       player.score = 0;
       player.bingoCount = 0;
+      player.bingoProgress = 0;
+      player.letters = [];
       player.completedLines = [];
+      player.hasBingo = false;
+      player.bingoRank = undefined;
     }
 
     db.resetCalledNumbers(this.code);
     db.resetBingoClaims(this.code);
+
+    // Make sure initial turn index points to a connected player
+    const playerList = this.getPlayerList();
+    if (playerList.length > 0 && playerList[0].connectionStatus !== 'connected') {
+      const firstConnected = playerList.findIndex((p) => p.connectionStatus === 'connected');
+      if (firstConnected !== -1) {
+        this.turnIndex = firstConnected;
+      }
+    }
 
     this.broadcastState();
     this.startTurnTimer();
@@ -450,47 +540,53 @@ export class GameRoom {
 
   private startTurnTimer() {
     if (this.turnTimer) {
-      clearInterval(this.turnTimer);
+      clearTimeout(this.turnTimer);
       this.turnTimer = null;
     }
 
-    if (this.settings.turnTimeoutSeconds <= 0) {
+    if (this.status !== 'PLAYING') {
+      this.turnStartedAt = null;
+      this.turnExpiresAt = null;
       this.turnSecondsLeft = null;
       return;
     }
 
-    this.turnSecondsLeft = this.settings.turnTimeoutSeconds;
+    if (this.settings.turnTimeoutSeconds <= 0) {
+      this.turnStartedAt = null;
+      this.turnExpiresAt = null;
+      this.turnSecondsLeft = null;
+      return;
+    }
 
-    this.turnTimer = setInterval(() => {
-      if (this.turnSecondsLeft !== null && this.turnSecondsLeft > 0) {
-        this.turnSecondsLeft -= 1;
-        if (this.turnSecondsLeft === 0) {
-          this.handleTurnTimeout();
-        }
-      }
-    }, 1000);
+    const timeoutSec = this.settings.turnTimeoutSeconds > 0 ? this.settings.turnTimeoutSeconds : 30;
+    const now = Date.now();
+    this.turnStartedAt = now;
+    this.turnExpiresAt = now + timeoutSec * 1000;
+    this.turnSecondsLeft = timeoutSec;
+
+    this.turnTimer = setTimeout(() => {
+      this.handleTurnTimeout();
+    }, timeoutSec * 1000);
   }
 
   private handleTurnTimeout() {
     if (this.status !== 'PLAYING') return;
 
-    // Pick a random uncalled number or advance turn
+    // Pick a random uncalled number
     const calledSet = new Set(this.calledNumbers);
     const uncalled: number[] = [];
     for (let i = 1; i <= 25; i++) {
       if (!calledSet.has(i)) uncalled.push(i);
     }
 
-    if (uncalled.length > 0) {
+    const currentTurn = this.getCurrentTurnPlayer();
+    if (uncalled.length > 0 && currentTurn) {
       const randomNum = uncalled[Math.floor(Math.random() * uncalled.length)];
-      const currentTurn = this.getCurrentTurnPlayer();
-      if (currentTurn) {
-        this.callNumber(currentTurn.id, randomNum);
-      } else {
-        this.advanceTurn();
-      }
-    } else {
+      this.callNumber(currentTurn.id, randomNum);
+    } else if (uncalled.length === 0) {
       this.finishGame();
+    } else {
+      this.advanceTurn();
     }
   }
 
@@ -500,7 +596,10 @@ export class GameRoom {
     const playerList = this.getPlayerList();
     if (playerList.length === 0) return;
 
-    // Find next eligible player who is connected
+    const connectedPlayers = playerList.filter((p) => p.connectionStatus === 'connected');
+    if (connectedPlayers.length === 0) return;
+
+    // Find next eligible player who is connected in circular order
     let nextIndex = (this.turnIndex + 1) % playerList.length;
     let attempts = 0;
 
@@ -515,6 +614,32 @@ export class GameRoom {
     this.turnIndex = nextIndex;
     this.startTurnTimer();
     this.broadcastState();
+  }
+
+  /**
+   * Evaluates if all active connected players have achieved Bingo, or if all numbers called.
+   * If condition met, marks game as completed.
+   */
+  public checkGameCompletion(): boolean {
+    if (this.status !== 'PLAYING') return false;
+
+    const activePlayers = Array.from(this.players.values()).filter(
+      (p) => p.connectionStatus === 'connected'
+    );
+
+    // If there are active connected players, game completes ONLY when all active connected players have achieved Bingo
+    const allActiveHaveBingo =
+      activePlayers.length > 0 &&
+      activePlayers.every((p) => this.winnerHistory.some((w) => w.playerId === p.id));
+
+    const all25Called = this.calledNumbers.length >= 25;
+
+    if (allActiveHaveBingo || all25Called) {
+      this.finishGame();
+      return true;
+    }
+
+    return false;
   }
 
   // --- Core Gameplay: Number Calling ---
@@ -586,6 +711,8 @@ export class GameRoom {
             else scoreAwarded = cfg.subsequent;
 
             p.score += scoreAwarded;
+            p.hasBingo = true;
+            p.bingoRank = rank;
 
             const record: WinnerRecord = {
               playerId: p.id,
@@ -624,9 +751,23 @@ export class GameRoom {
       }
     }
 
-    // Advance turn to next player
+    // Check if all active connected players have completed Bingo or all 25 numbers called
+    const isFinished = this.checkGameCompletion();
+    if (isFinished) {
+      return { success: true };
+    }
+
+    // Advance turn to next connected player
     const playerList = this.getPlayerList();
-    const nextIndex = (this.turnIndex + 1) % playerList.length;
+    let nextIndex = (this.turnIndex + 1) % playerList.length;
+    let attempts = 0;
+    while (
+      playerList[nextIndex].connectionStatus !== 'connected' &&
+      attempts < playerList.length
+    ) {
+      nextIndex = (nextIndex + 1) % playerList.length;
+      attempts++;
+    }
     this.turnIndex = nextIndex;
     const nextPlayer = playerList[nextIndex];
 
@@ -640,11 +781,6 @@ export class GameRoom {
 
     this.startTurnTimer();
     this.broadcastState();
-
-    // Check if configured max winners reached (or all 25 numbers called)
-    if (this.winnerHistory.length >= this.settings.maxWinners || this.calledNumbers.length >= 25) {
-      this.finishGame();
-    }
 
     return { success: true };
   }
@@ -720,6 +856,8 @@ export class GameRoom {
         else scoreAwarded += cfg.subsequent;
 
         player.score += scoreAwarded;
+        player.hasBingo = true;
+        player.bingoRank = rank;
 
         const record: WinnerRecord = {
           playerId: player.id,
@@ -759,11 +897,7 @@ export class GameRoom {
     }
 
     this.broadcastState();
-
-    if (this.winnerHistory.length >= this.settings.maxWinners) {
-      this.finishGame();
-    }
-
+    this.checkGameCompletion();
 
     return {
       success: true,
@@ -778,9 +912,11 @@ export class GameRoom {
 
   public finishGame() {
     if (this.turnTimer) {
-      clearInterval(this.turnTimer);
+      clearTimeout(this.turnTimer);
       this.turnTimer = null;
     }
+    this.turnStartedAt = null;
+    this.turnExpiresAt = null;
     this.turnSecondsLeft = null;
     this.status = 'RESULTS';
 
@@ -793,7 +929,7 @@ export class GameRoom {
 
     if (this.callbacks) {
       this.callbacks.onGameCompleted({
-        winnerHistory: this.winnerHistory,
+        winnerHistory: [...this.winnerHistory],
         finalScores,
       });
     }
@@ -814,9 +950,12 @@ export class GameRoom {
     this.winnerHistory = [];
     this.claimedLinesByPlayer.clear();
     this.turnIndex = 0;
+    this.turnStartedAt = null;
+    this.turnExpiresAt = null;
+    this.turnSecondsLeft = null;
 
     if (this.turnTimer) {
-      clearInterval(this.turnTimer);
+      clearTimeout(this.turnTimer);
       this.turnTimer = null;
     }
 
@@ -824,7 +963,12 @@ export class GameRoom {
       p.board = null;
       p.isReady = false;
       p.bingoCount = 0;
+      p.bingoProgress = 0;
+      p.letters = [];
       p.completedLines = [];
+      p.completedLineIds = [];
+      p.hasBingo = false;
+      p.bingoRank = undefined;
       this.claimedLinesByPlayer.set(p.id, new Set());
     }
 

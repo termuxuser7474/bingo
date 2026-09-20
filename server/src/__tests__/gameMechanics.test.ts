@@ -449,4 +449,152 @@ describe('BINGO Authoritative Game Mechanics & Rules', () => {
     expect(unauthorizedSettings.success).toBe(false);
     expect(unauthorizedSettings.error).toContain('Only the host');
   });
+
+  // 21. Player continues playing after achieving Bingo until all active players finish
+  it('21. Player continues participating after getting Bingo; game ends only after all active players achieve Bingo', () => {
+    const room = new GameRoom('TEST21', { name: 'Alice', avatar: 'cat' });
+    const p2 = room.addPlayer('Bob', 'dog').player!;
+
+    // Alice has standard 1..25 board
+    const b1 = Array.from({ length: 25 }, (_, i) => i + 1);
+    // Bob has board where 22, 23, 24, 25 are spread across remaining lines
+    const b2 = [
+      1, 6, 11, 16, 21,
+      22, 7, 12, 17, 2,
+      3, 23, 13, 18, 8,
+      9, 4, 24, 14, 19,
+      20, 10, 5, 25, 15,
+    ];
+
+    room.setBoard(room.hostId, b1);
+    room.setBoard(p2.id, b2);
+    room.status = 'PLAYING';
+
+    // Call numbers 1..21. Alice will achieve Bingo (5+ lines), Bob will only have 4 lines.
+    for (let num = 1; num <= 21; num++) {
+      const cur = room.getCurrentTurnPlayer()!;
+      expect(cur).toBeDefined();
+      room.callNumber(cur.id, num);
+    }
+
+    // Alice has achieved Bingo first (Rank 1), but Bob has not yet (has 4 lines)
+    expect(room.winnerHistory.length).toBe(1);
+    expect(room.winnerHistory[0].playerId).toBe(room.hostId);
+    expect(room.winnerHistory[0].rank).toBe(1);
+    expect(room.players.get(room.hostId)?.hasBingo).toBe(true);
+    expect(room.players.get(p2.id)?.hasBingo).toBe(false);
+
+    // CRITICAL: Game MUST still be PLAYING so remaining players continue!
+    expect(room.status).toBe('PLAYING');
+
+    // Alice continues participating and taking turns normally!
+    const afterBingoPlayer = room.getCurrentTurnPlayer()!;
+    expect(afterBingoPlayer).toBeDefined();
+
+    // Now call number 22, which completes Bob's 5th line (Row 1: [22, 7, 12, 17, 2])
+    room.callNumber(afterBingoPlayer.id, 22);
+
+    // Both players have now achieved Bingo
+    expect(room.winnerHistory.length).toBe(2);
+    expect(room.winnerHistory[0].playerId).toBe(room.hostId);
+    expect(room.winnerHistory[0].rank).toBe(1);
+    expect(room.winnerHistory[1].playerId).toBe(p2.id);
+    expect(room.winnerHistory[1].rank).toBe(2);
+
+    // All active connected players have achieved Bingo -> match transitions to RESULTS!
+    expect(room.status).toBe('RESULTS');
+  });
+
+  // 22. Deterministic host election when host leaves
+  it('22. Earliest joined active connected player is deterministically elected as new host when host leaves', () => {
+    const room = new GameRoom('TEST22', { name: 'Alice', avatar: 'cat' });
+    const bob = room.addPlayer('Bob', 'dog').player!;
+    const charlie = room.addPlayer('Charlie', 'fox').player!;
+
+    expect(room.hostId).toBe(room.getPlayerList()[0].id);
+
+    // Alice (host) leaves
+    room.removePlayer(room.hostId);
+
+    // Bob joined before Charlie, so Bob must be elected as host
+    expect(room.hostId).toBe(bob.id);
+    expect(room.players.get(bob.id)?.isHost).toBe(true);
+    expect(room.players.get(charlie.id)?.isHost).toBe(false);
+
+    // Verify Bob has host privileges (can update settings)
+    const updateRes = room.updateSettings(bob.id, { maxPlayers: 4 });
+    expect(updateRes.success).toBe(true);
+
+    // Verify Charlie does not have host privileges
+    const unauthorized = room.updateSettings(charlie.id, { maxPlayers: 5 });
+    expect(unauthorized.success).toBe(false);
+  });
+
+  // 23. Disconnected player is bypassed in turn rotation
+  it('23. Disconnected player is bypassed in circular turn rotation', () => {
+    const room = new GameRoom('TEST23', { name: 'Alice', avatar: 'cat' });
+    const bob = room.addPlayer('Bob', 'dog').player!;
+    const charlie = room.addPlayer('Charlie', 'fox').player!;
+
+    room.setBoard(room.hostId, generateRandomBoard());
+    room.setBoard(bob.id, generateRandomBoard());
+    room.setBoard(charlie.id, generateRandomBoard());
+    room.status = 'PLAYING';
+
+    // Alice turn
+    expect(room.getCurrentTurnPlayer()?.id).toBe(room.hostId);
+    room.callNumber(room.hostId, 1);
+
+    // Bob is disconnected
+    room.handleDisconnect(bob.id);
+
+    // Advance turn: should skip disconnected Bob and land on Charlie!
+    expect(room.getCurrentTurnPlayer()?.id).toBe(charlie.id);
+    room.callNumber(charlie.id, 2);
+
+    // Next turn rotates back to Alice, skipping Bob again!
+    expect(room.getCurrentTurnPlayer()?.id).toBe(room.hostId);
+  });
+
+  // 24. Authoritative turn timer deadline
+  it('24. Authoritative turn deadline created on turn start', () => {
+    const room = new GameRoom('TEST24', { name: 'Alice', avatar: 'cat' }, { turnTimeoutSeconds: 30 });
+    const bob = room.addPlayer('Bob', 'dog').player!;
+
+    room.setBoard(room.hostId, generateRandomBoard());
+    room.setBoard(bob.id, generateRandomBoard());
+    room.status = 'PLAYING';
+    room.advanceTurn();
+
+    const state = room.toState();
+    expect(state.turnStartedAt).toBeTypeOf('number');
+    expect(state.turnExpiresAt).toBeTypeOf('number');
+    expect(state.turnExpiresAt! - state.turnStartedAt!).toBe(30000);
+    expect(state.turnTimeRemaining).toBeGreaterThanOrEqual(29);
+    expect(state.turnTimeRemaining).toBeLessThanOrEqual(30);
+
+    room.destroy();
+  });
+
+  // 25. Reconnected player does not usurp host role if a new host was already elected
+  it('25. Departing host does not usurp host role upon reconnecting', () => {
+    const room = new GameRoom('TEST25', { name: 'Alice', avatar: 'cat' });
+    const aliceId = room.hostId;
+    const aliceToken = room.players.get(aliceId)!.reconnectToken;
+    const bob = room.addPlayer('Bob', 'dog').player!;
+
+    // Alice disconnects -> Bob becomes host
+    room.handleDisconnect(aliceId);
+    expect(room.hostId).toBe(bob.id);
+
+    // Alice reconnects
+    room.reconnectPlayer(aliceId, aliceToken);
+    // Bob remains host!
+    expect(room.hostId).toBe(bob.id);
+    expect(room.players.get(aliceId)?.isHost).toBe(false);
+    expect(room.players.get(bob.id)?.isHost).toBe(true);
+
+    room.destroy();
+  });
 });
+

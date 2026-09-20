@@ -63,6 +63,9 @@ export interface Player {
   completedLines: BingoLine[];
   connectionStatus: 'connected' | 'disconnected';
   reconnectToken: string;
+  joinedAt: number;
+  bingoRank?: number;
+  hasBingo?: boolean;
 }
 
 
@@ -100,6 +103,8 @@ export interface GameState {
   players: Player[];
   turnIndex: number;
   currentTurnPlayerId: string | null;
+  turnStartedAt: number | null;
+  turnExpiresAt: number | null;
   turnTimeRemaining: number | null;
   calledNumbers: number[];
   lastCalledNumber: number | null;

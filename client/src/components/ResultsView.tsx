@@ -36,8 +36,20 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
   };
 
   const sortedPlayers = [...room.players].sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score;
-    return b.bingoCount - a.bingoCount;
+    const rankA = room.winnerHistory.find((w) => w.playerId === a.id)?.rank;
+    const rankB = room.winnerHistory.find((w) => w.playerId === b.id)?.rank;
+
+    // Both players achieved Bingo: strict chronological order
+    if (rankA !== undefined && rankB !== undefined) {
+      return rankA - rankB;
+    }
+    // Player who got Bingo ranks ahead of player who did not
+    if (rankA !== undefined) return -1;
+    if (rankB !== undefined) return 1;
+
+    // If neither got Bingo before match end: lines completed then score
+    if (b.bingoCount !== a.bingoCount) return b.bingoCount - a.bingoCount;
+    return b.score - a.score;
   });
 
   return (
@@ -229,8 +241,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
                       <div style={{ fontWeight: 800, fontSize: '14px' }}>{player.name}</div>
                       <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
                         {winnerPos
-                          ? `Claimed ${winnerPos.rank === 1 ? '1st' : winnerPos.rank === 2 ? '2nd' : '3rd'} Bingo`
-                          : 'No Bingo claimed'}
+                          ? `Claimed ${winnerPos.rank === 1 ? '1st' : winnerPos.rank === 2 ? '2nd' : winnerPos.rank === 3 ? '3rd' : `${winnerPos.rank}th`} Bingo (Rank #${winnerPos.rank})`
+                          : 'No Bingo completed'}
                       </div>
                     </div>
                   </div>

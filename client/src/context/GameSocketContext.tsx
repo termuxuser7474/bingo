@@ -354,8 +354,10 @@ export const GameSocketProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   const myPlayer = room?.players.find((p) => p.id === playerId) || null;
-  const isHost = myPlayer?.isHost ?? false;
-  const isMyTurn = room?.currentTurnPlayerId === playerId;
+  const isHost = (room?.hostId && playerId) ? room.hostId === playerId : (myPlayer?.isHost ?? false);
+  const isMyTurn = (room?.status === 'PLAYING' && room?.currentTurnPlayerId && playerId)
+    ? room.currentTurnPlayerId === playerId
+    : false;
 
   return (
     <GameContext.Provider

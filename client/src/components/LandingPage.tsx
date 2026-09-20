@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlusCircle, LogIn, HelpCircle, Gamepad2, Zap, Trophy, Grid, Wifi, WifiOff } from 'lucide-react';
 import { useGame } from '../context/GameSocketContext.js';
 import { CreateRoomModal } from './CreateRoomModal.js';
@@ -11,6 +11,29 @@ export const LandingPage: React.FC = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showOfflineAlert, setShowOfflineAlert] = useState(false);
+
+  useEffect(() => {
+    if (isConnected) {
+      setShowOfflineAlert(false);
+      return;
+    }
+
+    // If already explicitly confirmed unreachable or failed, show alert immediately
+    if (connectionDiagnostic?.status === 'unreachable' || connectionDiagnostic?.status === 'failed') {
+      setShowOfflineAlert(true);
+      return;
+    }
+
+    // During normal initial connecting handshake, give 2.5s grace period before showing alert
+    const timer = setTimeout(() => {
+      if (!isConnected) {
+        setShowOfflineAlert(true);
+      }
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [isConnected, connectionDiagnostic?.status]);
 
   const [playerName, setPlayerName] = useState(() => {
     try {
@@ -99,24 +122,56 @@ export const LandingPage: React.FC = () => {
               fontWeight: 600,
               padding: '5px 10px',
               borderRadius: 'var(--radius-full)',
-              backgroundColor: isConnected ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-              border: `1px solid ${isConnected ? 'rgba(34, 197, 94, 0.35)' : 'rgba(239, 68, 68, 0.35)'}`,
-              color: isConnected ? '#4ade80' : '#f87171',
+              backgroundColor: isConnected
+                ? 'rgba(34, 197, 94, 0.12)'
+                : connectionDiagnostic?.status === 'connecting'
+                ? 'rgba(245, 158, 11, 0.12)'
+                : 'rgba(239, 68, 68, 0.12)',
+              border: `1px solid ${
+                isConnected
+                  ? 'rgba(34, 197, 94, 0.35)'
+                  : connectionDiagnostic?.status === 'connecting'
+                  ? 'rgba(245, 158, 11, 0.35)'
+                  : 'rgba(239, 68, 68, 0.35)'
+              }`,
+              color: isConnected
+                ? '#4ade80'
+                : connectionDiagnostic?.status === 'connecting'
+                ? '#fbbf24'
+                : '#f87171',
               transition: 'all 0.3s ease',
             }}
-            title={isConnected ? 'Connected to game server' : 'Backend server offline or unreachable'}
+            title={
+              isConnected
+                ? 'Connected to game server'
+                : connectionDiagnostic?.status === 'connecting'
+                ? 'Connecting to game server...'
+                : 'Backend server offline or unreachable'
+            }
           >
             <span
               style={{
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: isConnected ? '#22c55e' : '#ef4444',
-                boxShadow: isConnected ? '0 0 8px #22c55e' : '0 0 8px #ef4444',
+                backgroundColor: isConnected
+                  ? '#22c55e'
+                  : connectionDiagnostic?.status === 'connecting'
+                  ? '#f59e0b'
+                  : '#ef4444',
+                boxShadow: isConnected
+                  ? '0 0 8px #22c55e'
+                  : connectionDiagnostic?.status === 'connecting'
+                  ? '0 0 8px #f59e0b'
+                  : '0 0 8px #ef4444',
                 display: 'inline-block',
               }}
             />
-            {isConnected ? 'Online' : 'Offline'}
+            {isConnected
+              ? 'Online'
+              : connectionDiagnostic?.status === 'connecting'
+              ? 'Connecting...'
+              : 'Offline'}
           </div>
 
           <button
@@ -131,7 +186,7 @@ export const LandingPage: React.FC = () => {
       </header>
 
       {/* Offline Alert Banner */}
-      {!isConnected && (
+      {!isConnected && showOfflineAlert && (
         <div
           role="alert"
           style={{

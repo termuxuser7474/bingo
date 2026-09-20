@@ -7,7 +7,7 @@ import { HowToPlayModal } from './HowToPlayModal.js';
 import { SoundToggle } from './SoundToggle.js';
 
 export const LandingPage: React.FC = () => {
-  const { isConnected } = useGame();
+  const { isConnected, connectionDiagnostic } = useGame();
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
@@ -133,25 +133,66 @@ export const LandingPage: React.FC = () => {
       {/* Offline Alert Banner */}
       {!isConnected && (
         <div
+          role="alert"
           style={{
             width: '100%',
             maxWidth: '680px',
             marginBottom: '16px',
-            padding: '10px 16px',
-            backgroundColor: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
+            padding: '12px 16px',
+            backgroundColor:
+              connectionDiagnostic?.status === 'failed'
+                ? 'rgba(245, 158, 11, 0.12)'
+                : 'rgba(239, 68, 68, 0.12)',
+            border: `1px solid ${
+              connectionDiagnostic?.status === 'failed'
+                ? 'rgba(245, 158, 11, 0.35)'
+                : 'rgba(239, 68, 68, 0.35)'
+            }`,
             borderRadius: 'var(--radius-md)',
-            color: '#fca5a5',
+            color: connectionDiagnostic?.status === 'failed' ? '#fcd34d' : '#fca5a5',
             fontSize: '13px',
             display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
+            flexDirection: 'column',
+            gap: '8px',
             textAlign: 'left',
           }}
         >
-          <WifiOff size={18} style={{ flexShrink: 0, color: '#ef4444' }} />
-          <div>
-            <strong>Backend Server Not Connected.</strong> If you deployed this on Vercel, please deploy the backend server (e.g. on Render) and set <code style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: '2px 5px', borderRadius: '4px' }}>VITE_SERVER_URL</code>.
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <WifiOff
+              size={18}
+              style={{
+                flexShrink: 0,
+                color: connectionDiagnostic?.status === 'failed' ? '#f59e0b' : '#ef4444',
+              }}
+            />
+            <div style={{ fontWeight: 700 }}>Backend Server Not Connected!</div>
+            <span
+              style={{
+                marginLeft: 'auto',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '11px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                backgroundColor:
+                  connectionDiagnostic?.status === 'failed'
+                    ? 'rgba(245, 158, 11, 0.25)'
+                    : 'rgba(239, 68, 68, 0.25)',
+                color: connectionDiagnostic?.status === 'failed' ? '#fbbf24' : '#f87171',
+              }}
+            >
+              {connectionDiagnostic?.status === 'unreachable'
+                ? 'BACKEND UNREACHABLE'
+                : connectionDiagnostic?.status === 'failed'
+                ? 'SOCKET.IO CONNECTION FAILED'
+                : 'CONNECTING...'}
+            </span>
+          </div>
+          <div style={{ fontSize: '12px', opacity: 0.95, lineHeight: 1.5 }}>
+            {connectionDiagnostic?.detail || 'Connecting to multiplayer backend server...'}
+          </div>
+          <div style={{ fontSize: '11px', opacity: 0.8, fontFamily: 'monospace' }}>
+            Target URL: {connectionDiagnostic?.serverUrl || '(same origin / local proxy)'}
           </div>
         </div>
       )}

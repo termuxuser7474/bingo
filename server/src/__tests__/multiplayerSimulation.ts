@@ -15,7 +15,8 @@ function delay(ms: number) {
 async function runMultiplayerE2ETest() {
   console.log('🚀 Starting Automated Real-Time Multiplayer E2E Test...');
 
-  const SERVER_URL = 'http://localhost:3001';
+  const SERVER_URL =
+    process.env.TEST_SERVER_URL || process.env.VITE_SERVER_URL || 'http://localhost:3001';
 
   // 1. Connect Client 1 (Alice - Host)
   console.log('1. Connecting Alice (Host)...');

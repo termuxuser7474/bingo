@@ -20,8 +20,17 @@ interface BingoAnnouncement {
   scoreAwarded: number;
 }
 
+export type ConnectionDiagnosticStatus = 'connecting' | 'connected' | 'unreachable' | 'failed';
+
+export interface ConnectionDiagnostic {
+  status: ConnectionDiagnosticStatus;
+  detail: string;
+  serverUrl: string;
+}
+
 interface GameContextType {
   isConnected: boolean;
+  connectionDiagnostic: ConnectionDiagnostic;
   room: GameState | null;
   playerId: string | null;
   reconnectToken: string | null;
@@ -51,6 +60,11 @@ const STORAGE_KEY = 'bingo_active_session';
 export const GameSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionDiagnostic, setConnectionDiagnostic] = useState<ConnectionDiagnostic>({
+    status: 'connecting',
+    detail: 'Initializing connection...',
+    serverUrl: '',
+  });
   const [room, setRoom] = useState<GameState | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [reconnectToken, setReconnectToken] = useState<string | null>(null);
@@ -60,23 +74,76 @@ export const GameSocketProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   // Initialize socket
   useEffect(() => {
-    // In dev: proxy handles /socket.io to localhost:3001
-    // If VITE_SERVER_URL is provided (e.g. Vercel deployment pointing to Render/Railway), use it.
-    // Otherwise falls back to window.location.origin.
-    const serverUrl = (import.meta as any).env?.VITE_SERVER_URL || undefined;
+    // Configure server URL from Vite environment variable (Render Web Service backend)
+    // Production example: https://zyraforge-bingo-api.onrender.com
+    // In local dev without VITE_SERVER_URL: falls back to window.location.origin (handled by dev proxy)
+    const rawUrl = (import.meta as any).env?.VITE_SERVER_URL;
+    const serverUrl =
+      typeof rawUrl === 'string' && rawUrl.trim() !== ''
+        ? rawUrl.trim().replace(/\/+$/, '')
+        : undefined;
+
+    const displayUrl = serverUrl || window.location.origin;
+
+    console.log('[SOCKET] Connecting to:', displayUrl);
+    setConnectionDiagnostic({
+      status: 'connecting',
+      detail: `Connecting to ${displayUrl}...`,
+      serverUrl: displayUrl,
+    });
+
+    const checkBackendHealth = async (): Promise<boolean> => {
+      try {
+        const target = serverUrl ? `${serverUrl}/health` : '/health';
+        const res = await fetch(target, { method: 'GET', mode: 'cors' });
+        if (res.ok) {
+          const data = await res.json().catch(() => null);
+          return data?.status === 'ok';
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    };
+
     const socket = io(serverUrl, {
       transports: ['websocket', 'polling'],
-      reconnectionAttempts: 10,
+      reconnectionAttempts: 20,
       reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 10000,
     });
     socketRef.current = socket;
 
-    socket.on('connect_error', (err) => {
-      console.warn('Socket connection error:', err.message);
+    socket.on('connect_error', async (err) => {
+      console.error('[SOCKET] Connection error:', err.message);
+      setIsConnected(false);
+
+      const isAlive = await checkBackendHealth();
+      if (isAlive) {
+        setConnectionDiagnostic({
+          status: 'failed',
+          detail: `HTTP /health is responding, but Socket.IO failed: ${err.message}. Check CORS or transport options.`,
+          serverUrl: displayUrl,
+        });
+      } else {
+        setConnectionDiagnostic({
+          status: 'unreachable',
+          detail: `Cannot reach backend server at ${displayUrl}. Check if Render Web Service is deployed and active.`,
+          serverUrl: displayUrl,
+        });
+      }
     });
 
     socket.on('connect', () => {
+      console.log('[SOCKET] Connected:', socket.id);
       setIsConnected(true);
+      setErrorNotification(null);
+      setConnectionDiagnostic({
+        status: 'connected',
+        detail: `Connected to ${displayUrl} (Socket ID: ${socket.id})`,
+        serverUrl: displayUrl,
+      });
 
       // Check for saved session to auto-reconnect
       try {
@@ -109,8 +176,14 @@ export const GameSocketProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
+      console.warn('[SOCKET] Disconnected:', reason);
       setIsConnected(false);
+      setConnectionDiagnostic({
+        status: 'failed',
+        detail: `Disconnected from server: ${reason}`,
+        serverUrl: displayUrl,
+      });
     });
 
     socket.on('room:state_update', (newRoomState) => {
@@ -363,6 +436,7 @@ export const GameSocketProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     <GameContext.Provider
       value={{
         isConnected,
+        connectionDiagnostic,
         room,
         playerId,
         reconnectToken,

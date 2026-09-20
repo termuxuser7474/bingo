@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useGame } from '../context/GameSocketContext.js';
 import { SoundToggle } from './SoundToggle.js';
+import { ZyraforgePromoCard } from './ZyraforgePromoCard.js';
 
 interface LobbyViewProps {
   onPrepareBoard: () => void;
@@ -348,6 +349,8 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ onPrepareBoard }) => {
           </div>
         )}
       </div>
+    {/* Zyraforge Promotional Card */}
+      <ZyraforgePromoCard compact style={{ marginTop: '4px' }} />
     </div>
   );
 };

@@ -5,6 +5,8 @@ import { CreateRoomModal } from './CreateRoomModal.js';
 import { JoinRoomModal } from './JoinRoomModal.js';
 import { HowToPlayModal } from './HowToPlayModal.js';
 import { SoundToggle } from './SoundToggle.js';
+import { ZyraforgePromoCard } from './ZyraforgePromoCard.js';
+import { ZyraforgeFooter } from './ZyraforgeFooter.js';
 
 export const LandingPage: React.FC = () => {
   const { isConnected, connectionDiagnostic } = useGame();
@@ -381,6 +383,11 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
+{/* Zyraforge Promotional Card */}
+        <div style={{ width: '100%', marginTop: '16px' }}>
+          <ZyraforgePromoCard />
+        </div>
+
         {/* Feature Pill Highlights */}
         <div
           style={{
@@ -403,9 +410,10 @@ export const LandingPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer style={{ marginTop: '24px', color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center' }}>
-        Production-quality multiplayer BINGO • Real-time Socket.IO Engine
+{/* Footer */}
+      <footer style={{ marginTop: '24px', color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+        <div>Production-quality multiplayer BINGO • Real-time Socket.IO Engine</div>
+        <ZyraforgeFooter style={{ padding: '4px 0 8px' }} />
       </footer>
 
       {/* Modals */}

@@ -12,6 +12,7 @@ import {
 import { useGame } from '../context/GameSocketContext.js';
 import { ConfettiEffect } from './ConfettiEffect.js';
 import { SoundToggle } from './SoundToggle.js';
+import { ZyraforgeFooter } from './ZyraforgeFooter.js';
 
 interface ResultsViewProps {
   onReturnHome: () => void;
@@ -192,7 +193,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
         </div>
 
         {/* Match Statistics & Final Leaderboard */}
-        <div className="glass-panel" style={{ padding: '28px' }}>
+        <div className="glass-panel" style={{ padding: 'clamp(14px, 3vw, 24px)', width: '100%', boxSizing: 'border-box' }}>
           <div
             style={{
               display: 'flex',
@@ -221,25 +222,21 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
               return (
                 <div
                   key={player.id}
+                  className="leaderboard-player-card"
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: 'clamp(10px, 2.5vw, 16px)',
                     background: idx === 0 ? 'rgba(251, 191, 36, 0.1)' : 'rgba(15, 23, 42, 0.4)',
                     border: idx === 0 ? '1px solid rgba(251, 191, 36, 0.4)' : '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    gap: '8px',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(6px, 2vw, 12px)' }}>
-                    <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--text-muted)', width: '20px' }}>
+                  {/* Left / Row 1 Left: Player Info */}
+                  <div className="leaderboard-player-info">
+                    <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--text-muted)', width: '20px', flexShrink: 0 }}>
                       #{idx + 1}
                     </div>
-                    <div style={{ fontSize: '24px' }}>{player.avatar}</div>
-                    <div>
-                      <div style={{ fontWeight: 800, fontSize: '14px' }}>{player.name}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                    <div style={{ fontSize: '24px', flexShrink: 0 }}>{player.avatar}</div>
+                    <div className="leaderboard-player-text">
+                      <div className="leaderboard-player-name">{player.name}</div>
+                      <div className="leaderboard-player-sub">
                         {winnerPos
                           ? `Claimed ${winnerPos.rank === 1 ? '1st' : winnerPos.rank === 2 ? '2nd' : winnerPos.rank === 3 ? '3rd' : `${winnerPos.rank}th`} Bingo (Rank #${winnerPos.rank})`
                           : 'No Bingo completed'}
@@ -247,47 +244,49 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
                     </div>
                   </div>
 
-                  <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>
-                    <div>
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end', marginBottom: '4px' }}>
-                        {(['B', 'I', 'N', 'G', 'O'] as const).map((char) => {
-                          const earned = (player.letters || []).includes(char);
-                          return (
-                            <span
-                              key={char}
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '22px',
-                                height: '22px',
-                                borderRadius: '4px',
-                                fontSize: '11px',
-                                fontWeight: 900,
-                                fontFamily: 'var(--font-display)',
-                                background: earned ? 'linear-gradient(135deg, #10b981, #059669)' : 'rgba(255,255,255,0.06)',
-                                color: earned ? '#ffffff' : 'rgba(255,255,255,0.25)',
-                                border: earned ? '1px solid #34d399' : '1px solid rgba(255,255,255,0.08)',
-                                boxShadow: earned ? '0 0 8px rgba(16, 185, 129, 0.4)' : 'none',
-                              }}
-                            >
-                              {char}
-                            </span>
-                          );
-                        })}
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                        {player.bingoProgress ?? player.bingoCount} / 5 Lines Completed
-                      </div>
+                  {/* Row 2 on mobile / Column 2 on desktop: B-I-N-G-O Letters & Completed Lines */}
+                  <div className="leaderboard-letters-group">
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {(['B', 'I', 'N', 'G', 'O'] as const).map((char) => {
+                        const earned = (player.letters || []).includes(char);
+                        return (
+                          <span
+                            key={char}
+                            className="leaderboard-letter-pill"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '22px',
+                              height: '22px',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: 900,
+                              fontFamily: 'var(--font-display)',
+                              background: earned ? 'linear-gradient(135deg, #10b981, #059669)' : 'rgba(255,255,255,0.06)',
+                              color: earned ? '#ffffff' : 'rgba(255,255,255,0.25)',
+                              border: earned ? '1px solid #34d399' : '1px solid rgba(255,255,255,0.08)',
+                              boxShadow: earned ? '0 0 8px rgba(16, 185, 129, 0.4)' : 'none',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {char}
+                          </span>
+                        );
+                      })}
                     </div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      {player.bingoProgress ?? player.bingoCount} / 5 Lines Completed
+                    </div>
+                  </div>
 
-                    <div style={{ minWidth: '70px', textAlign: 'right' }}>
-                      <div style={{ fontSize: '18px', fontWeight: 900, color: '#fbbf24' }}>
-                        {player.score}
-                      </div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                        Points
-                      </div>
+                  {/* Top-Right on mobile / Column 3 on desktop: Points Box */}
+                  <div className="leaderboard-points-box">
+                    <div style={{ fontSize: '18px', fontWeight: 900, color: '#fbbf24' }}>
+                      {player.score}
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                      Points
                     </div>
                   </div>
                 </div>
@@ -330,6 +329,9 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ onReturnHome, onNewGam
             <Home size={18} /> HOME
           </button>
         </div>
+
+        {/* Zyraforge Compact Footer */}
+        <ZyraforgeFooter style={{ marginTop: '8px' }} />
       </div>
     </>
   );

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useGame } from '../context/GameSocketContext.js';
 import { SoundToggle } from './SoundToggle.js';
+import { ZyraforgeFooter } from './ZyraforgeFooter.js';
 import { BINGO_LINE_DEFINITIONS } from '../types/game.js';
 import { soundManager } from '../audio/soundManager.js';
 
@@ -982,6 +983,9 @@ export const GameplayView: React.FC = () => {
           {renderCalledNumbersBar()}
         </div>
       )}
+
+{/* Zyraforge Compact Footer */}
+      <ZyraforgeFooter style={{ marginTop: '12px', padding: '6px 0 14px' }} />
 
       {/* MOBILE PLAYERS BOTTOM SHEET */}
       {playersSheetOpen && (
